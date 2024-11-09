@@ -5,6 +5,10 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Copia_Abarrote_Inventario", "Copia_Abarrote_Inventario\Copia_Abarrote_Inventario.csproj", "{CA46362D-2A2D-4B6D-85CB-D02B76DB0A16}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapaDatos", "CapaDatos\CapaDatos.csproj", "{9069DE39-CD89-45FE-BCFF-AEE58F424E80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapaNegocio", "CapaNegocio\CapaNegocio.csproj", "{03A4E0DC-EC85-479F-836D-5326AB6A634E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{CA46362D-2A2D-4B6D-85CB-D02B76DB0A16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA46362D-2A2D-4B6D-85CB-D02B76DB0A16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA46362D-2A2D-4B6D-85CB-D02B76DB0A16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9069DE39-CD89-45FE-BCFF-AEE58F424E80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9069DE39-CD89-45FE-BCFF-AEE58F424E80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9069DE39-CD89-45FE-BCFF-AEE58F424E80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9069DE39-CD89-45FE-BCFF-AEE58F424E80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03A4E0DC-EC85-479F-836D-5326AB6A634E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03A4E0DC-EC85-479F-836D-5326AB6A634E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03A4E0DC-EC85-479F-836D-5326AB6A634E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03A4E0DC-EC85-479F-836D-5326AB6A634E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CapaNegocio;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,6 +14,7 @@ namespace Copia_Abarrote_Inventario
 {
     public partial class Form1 : Form
     {
+        public readonly NGraficas _reportService;
         private CheckBox checkBoxVentasPorMes;
         private CheckBox checkBoxVentasPorCliente;
         private CheckBox checkBoxProductosVendidos;
@@ -20,6 +22,8 @@ namespace Copia_Abarrote_Inventario
         public Form1()
         {
             InitializeComponent();
+            ConfigurarControles();
+            _reportService = new NGraficas();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -33,7 +37,7 @@ namespace Copia_Abarrote_Inventario
             {
                 Text = "Ventas por Mes",
                 Location = new System.Drawing.Point(10, 10),
-                Checked = true
+                Checked = false
             };
             checkBoxVentasPorMes.CheckedChanged += async (s, e) => await ActualizarGraficoAsync();
 
@@ -41,7 +45,7 @@ namespace Copia_Abarrote_Inventario
             {
                 Text = "Ventas por Cliente",
                 Location = new System.Drawing.Point(10, 40),
-                Checked = true
+                Checked = false
             };
             checkBoxVentasPorCliente.CheckedChanged += async (s, e) => await ActualizarGraficoAsync();
 
@@ -49,7 +53,7 @@ namespace Copia_Abarrote_Inventario
             {
                 Text = "Productos Vendidos",
                 Location = new System.Drawing.Point(10, 70),
-                Checked = true
+                Checked = false
             };
             checkBoxProductosVendidos.CheckedChanged += async (s, e) => await ActualizarGraficoAsync();
 
@@ -57,7 +61,7 @@ namespace Copia_Abarrote_Inventario
             {
                 Text = "Ingreso Diario",
                 Location = new System.Drawing.Point(10, 100),
-                Checked = true
+                Checked = false
             };
             checkBoxIngresoDiario.CheckedChanged += async (s, e) => await ActualizarGraficoAsync();
 
@@ -69,7 +73,7 @@ namespace Copia_Abarrote_Inventario
         }
         private async Task ActualizarGraficoAsync()
         {
-            chart.Series.Clear();
+            chart1.Series.Clear();
 
             if (checkBoxVentasPorMes.Checked)
             {
