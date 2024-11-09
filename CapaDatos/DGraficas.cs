@@ -39,7 +39,7 @@ namespace CapaDatos
             var datos = new List<(object XValue, object YValue)>();
             try
             {
-                using (SqlConnection connection = new SqlConnection())
+                using (SqlConnection connection = await Utilidades.ObtenerConexionAsync())
                 {
                     
                     using (SqlCommand command = new SqlCommand(query, connection))
