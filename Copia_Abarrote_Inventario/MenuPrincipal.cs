@@ -55,7 +55,14 @@ namespace Copia_Abarrote_Inventario
 
         private void button1_Click(object sender, EventArgs e)
         {
+            ReporteForms reporteForms = new ReporteForms();
+            reporteForms.ShowDialog();
+        }
 
+        private void btnsaldo_Click(object sender, EventArgs e)
+        {
+            Saldos saldos = new Saldos();
+            saldos.ShowDialog();
         }
     }
 }

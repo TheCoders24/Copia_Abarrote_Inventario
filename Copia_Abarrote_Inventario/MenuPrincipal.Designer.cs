@@ -61,6 +61,7 @@
             this.btnsaldo.TabIndex = 16;
             this.btnsaldo.Text = "Saldo";
             this.btnsaldo.UseVisualStyleBackColor = true;
+            this.btnsaldo.Click += new System.EventHandler(this.btnsaldo_Click);
             // 
             // button1
             // 

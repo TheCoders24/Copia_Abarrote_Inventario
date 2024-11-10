@@ -97,6 +97,18 @@
     <Compile Include="Proveedores.Designer.cs">
       <DependentUpon>Proveedores.cs</DependentUpon>
     </Compile>
+    <Compile Include="ReporteForms.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReporteForms.Designer.cs">
+      <DependentUpon>ReporteForms.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Saldos.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Saldos.Designer.cs">
+      <DependentUpon>Saldos.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Clientes.resx">
       <DependentUpon>Clientes.cs</DependentUpon>
     </EmbeddedResource>
@@ -129,6 +141,12 @@
     </Compile>
     <EmbeddedResource Include="Proveedores.resx">
       <DependentUpon>Proveedores.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReporteForms.resx">
+      <DependentUpon>ReporteForms.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Saldos.resx">
+      <DependentUpon>Saldos.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
