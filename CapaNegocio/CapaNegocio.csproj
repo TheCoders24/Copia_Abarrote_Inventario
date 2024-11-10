@@ -41,7 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NCliente.cs" />
     <Compile Include="NGraficas.cs" />
+    <Compile Include="NLogger.cs" />
+    <Compile Include="NLogin.cs" />
+    <Compile Include="NProductos.cs" />
+    <Compile Include="NProveedores.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -12,8 +12,8 @@ namespace CapaDatos
         // Propiedades estáticas
         public static string SqlServer { get; set; } = "127.0.0.1"; // Valor predeterminado
         public static string SqlDataBase { get; set; } = "AbarroteDB"; // Valor predeterminado
-        public static string SqlUserId { get; set; } = "sa";
-        public static string SqlPassword { get; set; } = "12345";
+        public static string SqlUserId { get; set; }
+        public static string SqlPassword { get; set; }
 
         // Propiedad para obtener la cadena de conexión
         private static string ConnectionString

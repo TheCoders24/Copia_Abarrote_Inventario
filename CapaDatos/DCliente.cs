@@ -13,6 +13,10 @@ namespace CapaDatos
 
         Utilidades utilidades = new Utilidades();
        
+        public DCliente()
+        {
+
+        }
         public DCliente(int idCliente, string nombre, string telefono, string direccion, string textoBuscar)
         {
 
