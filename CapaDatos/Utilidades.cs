@@ -10,7 +10,7 @@ namespace CapaDatos
     public class Utilidades
     {
         // Propiedades estáticas
-        public static string SqlServer { get; set; } = "127.0.0.1"; // Valor predeterminado
+        public static string SqlServer { get; set; } = "."; // Valor predeterminado
         public static string SqlDataBase { get; set; } = "AbarroteDB"; // Valor predeterminado
         public static string SqlUserId { get; set; }
         public static string SqlPassword { get; set; }
