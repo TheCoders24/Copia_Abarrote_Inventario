@@ -166,17 +166,17 @@ namespace Copia_Abarrote_Inventario
             if (checkBoxVentasPorCliente.Checked)
             {
                 var datos = await _reportService.ObtenerVentasPorClienteAsync();
-                AgregarDatosAlGrafico("Ventas Por Cliente", datos, SeriesChartType.Line);
+                AgregarDatosAlGrafico("Ventas Por Cliente", datos, SeriesChartType.Pie);
             }
             if (checkBoxProductosVendidos.Checked)
             {
                 var datos = await _reportService.ObtenerProductosVendidosAsync();
-                AgregarDatosAlGrafico("Productos Vendidos", datos, SeriesChartType.Pie);
+                AgregarDatosAlGrafico("Productos Vendidos", datos, SeriesChartType.Column);
             }
             if (checkBoxIngresoDiario.Checked)
             {
                 var datos = await _reportService.ObtenerIngresoDiarioAsync();
-                AgregarDatosAlGrafico("Ingreso Diario", datos, SeriesChartType.Area);
+                AgregarDatosAlGrafico("Ingreso Diario", datos, SeriesChartType.Point);
             }
         }
 
