@@ -29,9 +29,17 @@ namespace CapaNegocio
             return await _repository.GetProductosVendidosAsync();
         }
 
-        public async Task<List<(object XValue, object YValue)>> ObtenerIngresoDiarioAsync()
+        //public async Task<List<(object XValue, object YValue)>> ObtenerIngresoDiarioAsync()
+        //{
+        //    return await _repository.GetIngresoDiarioAsync();
+        //}
+        // En la capa de negocio
+        public async Task<List<(object XValue, object YValue)>> ObtenerIngresoDiarioAsync(DateTime fechaInicio, DateTime fechaFin)
         {
-            return await _repository.GetIngresoDiarioAsync();
+            // Instancia o inyección del repositorio de datos
+             // Asumiendo que tienes un repositorio llamado así
+            return await _repository.GetIngresoDiarioAsync(fechaInicio, fechaFin);
         }
+
     }
 }

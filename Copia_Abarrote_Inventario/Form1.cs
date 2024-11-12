@@ -173,11 +173,24 @@ namespace Copia_Abarrote_Inventario
                 var datos = await _reportService.ObtenerProductosVendidosAsync();
                 AgregarDatosAlGrafico("Productos Vendidos", datos, SeriesChartType.Column);
             }
+            //if (checkBoxIngresoDiario.Checked)
+            //{
+            //    var datos = await _reportService.ObtenerIngresoDiarioAsync();
+            //    AgregarDatosAlGrafico("Ingreso Diario", datos, SeriesChartType.Point);
+            //}
             if (checkBoxIngresoDiario.Checked)
             {
-                var datos = await _reportService.ObtenerIngresoDiarioAsync();
+                // Obtener las fechas seleccionadas de los DateTimePicker
+                DateTime fechaInicio = dateTimePickerinicio.Value;
+                DateTime fechaFin = dateTimePickerfinal.Value;
+
+                // Pasar las fechas al método de servicio
+                var datos = await _reportService.ObtenerIngresoDiarioAsync(fechaInicio, fechaFin);
+
+                // Llamar al método para agregar los datos al gráfico con el tipo "Point"
                 AgregarDatosAlGrafico("Ingreso Diario", datos, SeriesChartType.Point);
             }
+
         }
 
         private void AgregarDatosAlGrafico(string serieNombre, List<(object XValue, object YValue)> datos, SeriesChartType chartType)

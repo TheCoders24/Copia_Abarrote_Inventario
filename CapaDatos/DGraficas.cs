@@ -24,15 +24,50 @@ namespace CapaDatos
 
         public async Task<List<(object XValue, object YValue)>> GetProductosVendidosAsync()
         {
-            string query = "SELECT NombreProducto, TotalProductosVendidos FROM Vista_ProductosVendidos";
+            string query = "SELECT NombreProducto, TotalUnidadesVendidas FROM Vista_TotalProductosVendidos";
             return await EjecutarConsultaAsync(query);
         }
 
-        public async Task<List<(object XValue, object YValue)>> GetIngresoDiarioAsync()
+        //public async Task<List<(object XValue, object YValue)>> GetIngresoDiarioAsync()
+        //{
+        //    string query = "SELECT * FROM Vista_IngresoDiario;";
+        //    return await EjecutarConsultaAsync(query);
+        //}
+
+        public async Task<List<(object XValue, object YValue)>> GetIngresoDiarioAsync(DateTime fechaInicio, DateTime fechaFin)
         {
-            string query = "SELECT FechaVenta, IngresoDiario FROM Vista_IngresoDiario";
-            return await EjecutarConsultaAsync(query);
+            string query = @"
+        SELECT FechaVenta, IngresoTotalDiario 
+        FROM Vista_IngresoDiario
+        WHERE FechaVenta BETWEEN @FechaInicio AND @FechaFin";
+
+            var resultado = new List<(object XValue, object YValue)>();
+
+            using (var connection = await Utilidades.ObtenerConexionAsync())
+            {
+                
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    // Definir los parámetros de la consulta
+                    command.Parameters.AddWithValue("@FechaInicio", fechaInicio);
+                    command.Parameters.AddWithValue("@FechaFin", fechaFin);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var fechaVenta = reader["FechaVenta"];
+                            var ingresoTotalDiario = reader["IngresoTotalDiario"];
+                            resultado.Add((fechaVenta, ingresoTotalDiario));
+                        }
+                    }
+                }
+            }
+
+            return resultado;
         }
+
 
         private async Task<List<(object XValue, object YValue)>> EjecutarConsultaAsync(string query)
         {
