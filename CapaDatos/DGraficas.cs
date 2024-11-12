@@ -12,6 +12,7 @@ namespace CapaDatos
 
         public async Task<List<(object XValue, object YValue)>> GetVentasPorMesAsync()
         {
+            //string query = "SELECT Mes, TotalVentasMes FROM Vista_VentasPorMes";
             string query = "SELECT Mes, TotalVentasMes FROM Vista_VentasPorMes";
             return await EjecutarConsultaAsync(query);
         }
