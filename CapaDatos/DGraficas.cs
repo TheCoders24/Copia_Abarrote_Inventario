@@ -38,9 +38,9 @@ namespace CapaDatos
         public async Task<List<(object XValue, object YValue)>> GetIngresoDiarioAsync(DateTime fechaInicio, DateTime fechaFin)
         {
             string query = @"
-        SELECT FechaVenta, IngresoTotalDiario 
-        FROM Vista_IngresoDiario
-        WHERE FechaVenta BETWEEN @FechaInicio AND @FechaFin";
+            SELECT FechaVenta, IngresoTotalDiario 
+            FROM Vista_IngresoDiario
+            WHERE FechaVenta BETWEEN @FechaInicio AND @FechaFin";
 
             var resultado = new List<(object XValue, object YValue)>();
 
