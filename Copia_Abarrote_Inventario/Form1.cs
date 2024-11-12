@@ -30,6 +30,88 @@ namespace Copia_Abarrote_Inventario
         {
 
         }
+        //private void ConfigurarControles()
+        //{
+        //    // Inicializar los CheckBox dinámicamente
+        //    checkBoxVentasPorMes = new CheckBox
+        //    {
+        //        Text = "Ventas por Mes",
+        //        Location = new System.Drawing.Point(10, 10),
+        //        Checked = false
+        //    };
+        //    checkBoxVentasPorMes.CheckedChanged += async (s, e) => await ActualizarGraficoAsync();
+
+        //    checkBoxVentasPorCliente = new CheckBox
+        //    {
+        //        Text = "Ventas por Cliente",
+        //        Location = new System.Drawing.Point(10, 40),
+        //        Checked = false
+        //    };
+        //    checkBoxVentasPorCliente.CheckedChanged += async (s, e) => await ActualizarGraficoAsync();
+
+        //    checkBoxProductosVendidos = new CheckBox
+        //    {
+        //        Text = "Productos Vendidos",
+        //        Location = new System.Drawing.Point(10, 70),
+        //        Checked = false
+        //    };
+        //    checkBoxProductosVendidos.CheckedChanged += async (s, e) => await ActualizarGraficoAsync();
+
+        //    checkBoxIngresoDiario = new CheckBox
+        //    {
+        //        Text = "Ingreso Diario",
+        //        Location = new System.Drawing.Point(10, 100),
+        //        Checked = false
+        //    };
+        //    checkBoxIngresoDiario.CheckedChanged += async (s, e) => await ActualizarGraficoAsync();
+
+        //    // Agregar los CheckBox al formulario
+        //    this.Controls.Add(checkBoxVentasPorMes);
+        //    this.Controls.Add(checkBoxVentasPorCliente);
+        //    this.Controls.Add(checkBoxProductosVendidos);
+        //    this.Controls.Add(checkBoxIngresoDiario);
+        //}
+        //private async Task ActualizarGraficoAsync()
+        //{
+        //    chart1.Series.Clear();
+
+        //    if (checkBoxVentasPorMes.Checked)
+        //    {
+        //        var datos = await _reportService.ObtenerVentasPorMesAsync();
+        //        AgregarDatosAlGrafico("Ventas Totales Por Mes", datos);
+        //    }
+        //    if (checkBoxVentasPorCliente.Checked)
+        //    {
+        //        var datos = await _reportService.ObtenerVentasPorClienteAsync();
+        //        AgregarDatosAlGrafico("Ventas Por Cliente", datos);
+        //    }
+        //    if (checkBoxProductosVendidos.Checked)
+        //    {
+        //        var datos = await _reportService.ObtenerProductosVendidosAsync();
+        //        AgregarDatosAlGrafico("Productos Vendidos", datos);
+        //    }
+        //    if (checkBoxIngresoDiario.Checked)
+        //    {
+        //        var datos = await _reportService.ObtenerIngresoDiarioAsync();
+        //        AgregarDatosAlGrafico("Ingreso Diario", datos);
+        //    }
+        //}
+
+        //private void AgregarDatosAlGrafico(string serieNombre, List<(object XValue, object YValue)> datos)
+        //{
+        //    Series series = new Series(serieNombre)
+        //    {
+
+        //        ChartType = SeriesChartType.Column
+
+        //    };
+        //    foreach (var dato in datos)
+        //    {
+        //        series.Points.AddXY(dato.XValue, dato.YValue);
+        //    }
+        //    chart1.Series.Add(series);
+        //}
+
         private void ConfigurarControles()
         {
             // Inicializar los CheckBox dinámicamente
@@ -71,6 +153,7 @@ namespace Copia_Abarrote_Inventario
             this.Controls.Add(checkBoxProductosVendidos);
             this.Controls.Add(checkBoxIngresoDiario);
         }
+
         private async Task ActualizarGraficoAsync()
         {
             chart1.Series.Clear();
@@ -78,36 +161,40 @@ namespace Copia_Abarrote_Inventario
             if (checkBoxVentasPorMes.Checked)
             {
                 var datos = await _reportService.ObtenerVentasPorMesAsync();
-                AgregarDatosAlGrafico("Ventas Totales Por Mes", datos);
+                AgregarDatosAlGrafico("Ventas Totales Por Mes", datos, SeriesChartType.Column);
             }
             if (checkBoxVentasPorCliente.Checked)
             {
                 var datos = await _reportService.ObtenerVentasPorClienteAsync();
-                AgregarDatosAlGrafico("Ventas Por Cliente", datos);
+                AgregarDatosAlGrafico("Ventas Por Cliente", datos, SeriesChartType.Line);
             }
             if (checkBoxProductosVendidos.Checked)
             {
                 var datos = await _reportService.ObtenerProductosVendidosAsync();
-                AgregarDatosAlGrafico("Productos Vendidos", datos);
+                AgregarDatosAlGrafico("Productos Vendidos", datos, SeriesChartType.Pie);
             }
             if (checkBoxIngresoDiario.Checked)
             {
                 var datos = await _reportService.ObtenerIngresoDiarioAsync();
-                AgregarDatosAlGrafico("Ingreso Diario", datos);
+                AgregarDatosAlGrafico("Ingreso Diario", datos, SeriesChartType.Area);
             }
         }
 
-        private void AgregarDatosAlGrafico(string serieNombre, List<(object XValue, object YValue)> datos)
+        private void AgregarDatosAlGrafico(string serieNombre, List<(object XValue, object YValue)> datos, SeriesChartType chartType)
         {
             Series series = new Series(serieNombre)
             {
-                ChartType = SeriesChartType.Column
+                ChartType = chartType
             };
+
             foreach (var dato in datos)
             {
                 series.Points.AddXY(dato.XValue, dato.YValue);
             }
+
             chart1.Series.Add(series);
         }
+
+
     }
 }
