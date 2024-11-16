@@ -47,32 +47,69 @@ namespace CapaDatos
                 return "Todos los campos son obligatorios.";
             }
 
-            try
+            #region Sin_Transacciones
+            //try
+            //{
+            //    using (var conexionSql = await Utilidades.ObtenerConexionAsync())
+            //    {
+            //        if (conexionSql == null)
+            //        {
+            //            throw new InvalidOperationException("No se pudo establecer la conexión a la base de datos.");
+            //        }
+
+            //        string consultaSql = "INSERT INTO Cliente (Nombre, Telefono, Direccion) VALUES (@nombre, @telefono, @direccion)";
+
+            //        using (var comandoSql = new SqlCommand(consultaSql, conexionSql))
+            //        {
+            //            comandoSql.Parameters.AddWithValue("@nombre", cliente.Nombre);
+            //            comandoSql.Parameters.AddWithValue("@telefono", cliente.Telefono);
+            //            comandoSql.Parameters.AddWithValue("@direccion", cliente.Direccion);
+
+            //            // Ejecutar la consulta y almacenar el resultado
+            //            var filasAfectadas = await comandoSql.ExecuteNonQueryAsync();
+            //            return filasAfectadas == 1 ? "Ok" : "No se pudo insertar el registro";
+            //        }
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    return "Ocurrió un error: " + ex.Message; // Manejo de excepciones
+            //}
+            #endregion
+
+            using (var conexionSql = await Utilidades.ObtenerConexionAsync())
             {
-                using (var conexionSql = await Utilidades.ObtenerConexionAsync())
+                if(conexionSql == null)
                 {
-                    if (conexionSql == null)
+                    throw new InvalidOperationException("No se pudo establecar la conexion");
+                }
+
+                using (var transaccion = conexionSql.BeginTransaction())
+                {
+                    try
                     {
-                        throw new InvalidOperationException("No se pudo establecer la conexión a la base de datos.");
+                        string consultaSql = "INSERT INTO Cliente (Nombre, Telefono, Direccion) VALUES (@nombre, @telefono, @direccion)";
+
+                        using (var comandoSql = new SqlCommand(consultaSql, conexionSql, transaccion))
+                        {
+                            comandoSql.Parameters.AddWithValue("@nombre", cliente.Nombre);
+                            comandoSql.Parameters.AddWithValue("@telefono", cliente.Telefono);
+                            comandoSql.Parameters.AddWithValue("@direccion", cliente.Direccion);
+
+                            // Ejecutar la consulta
+                            var filasAfectadas = await comandoSql.ExecuteNonQueryAsync();
+
+                            // Si todo salió bien, confirmar la transacción
+                            transaccion.Commit();
+                            return filasAfectadas == 1 ? "Ok" : "No se pudo insertar el registro";
+                        }
                     }
-
-                    string consultaSql = "INSERT INTO Cliente (Nombre, Telefono, Direccion) VALUES (@nombre, @telefono, @direccion)";
-
-                    using (var comandoSql = new SqlCommand(consultaSql, conexionSql))
+                    catch (Exception ex)
                     {
-                        comandoSql.Parameters.AddWithValue("@nombre", cliente.Nombre);
-                        comandoSql.Parameters.AddWithValue("@telefono", cliente.Telefono);
-                        comandoSql.Parameters.AddWithValue("@direccion", cliente.Direccion);
-
-                        // Ejecutar la consulta y almacenar el resultado
-                        var filasAfectadas = await comandoSql.ExecuteNonQueryAsync();
-                        return filasAfectadas == 1 ? "Ok" : "No se pudo insertar el registro";
+                        transaccion.Rollback();
+                        throw new Exception("Ocurrio un error durante la insercion" + ex);
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                return "Ocurrió un error: " + ex.Message; // Manejo de excepciones
             }
         }
         #endregion

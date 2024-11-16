@@ -26,7 +26,7 @@ namespace CapaDatos
                     throw new InvalidOperationException("El usuario y la contraseña no pueden estar vacíos.");
                 }
 
-                return $"Server={SqlServer};Database={SqlDataBase};User Id={SqlUserId};Password={SqlPassword};";
+                return $"Server={SqlServer};Database={SqlDataBase};User Id={SqlUserId};Password={SqlPassword};Pooling=true;Min Pool Size=1;Max Pool Size=100;";
             }
         }
 
