@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security;
 
 namespace CapaDatos
 {
@@ -125,18 +126,33 @@ namespace CapaDatos
                     {
                         throw new InvalidOperationException("No se pudo establecer la conexión a la base de datos.");
                     }
-
-                    string consultaSql = "UPDATE Cliente SET Nombre = @nombre, Telefono = @telefono, Direccion = @direccion WHERE ID_Cliente = @idcliente";
-
-                    using (var comandoSql = new SqlCommand(consultaSql, conexionSql))
+                    using (var transaccion = conexionSql.BeginTransaction())
                     {
-                        comandoSql.Parameters.AddWithValue("@idcliente", cliente.IdCliente);
-                        comandoSql.Parameters.AddWithValue("@nombre", cliente.Nombre);
-                        comandoSql.Parameters.AddWithValue("@telefono", cliente.Telefono);
-                        comandoSql.Parameters.AddWithValue("@direccion", cliente.Direccion);
 
-                        var filasAfectadas = await comandoSql.ExecuteNonQueryAsync();
-                        return filasAfectadas == 1 ? "Ok" : "No se pudo editar el registro";
+                        try
+                        {
+
+                            string consultaSql = "UPDATE Cliente SET Nombre = @nombre, Telefono = @telefono, Direccion = @direccion WHERE ID_Cliente = @idcliente";
+
+                            using (var comandoSql = new SqlCommand(consultaSql, conexionSql, transaccion))
+                            {
+                                comandoSql.Parameters.AddWithValue("@idcliente", cliente.IdCliente);
+                                comandoSql.Parameters.AddWithValue("@nombre", cliente.Nombre);
+                                comandoSql.Parameters.AddWithValue("@telefono", cliente.Telefono);
+                                comandoSql.Parameters.AddWithValue("@direccion", cliente.Direccion);
+
+                                var filasAfectadas = await comandoSql.ExecuteNonQueryAsync();
+                                transaccion.Commit();
+                                return filasAfectadas == 1 ? "Ok" : "No se pudo editar el registro";
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            transaccion.Rollback();
+                            throw new InvalidOperationException("No se Realizo la Transaccion Correctamente, Editar" + ex.ToString());
+                        }
+
                     }
                 }
             }
@@ -160,21 +176,41 @@ namespace CapaDatos
                         throw new InvalidOperationException("No se pudo establecer la conexión a la base de datos.");
                     }
 
-                    // Primero eliminamos las ventas relacionadas
-                    string eliminarVentasSql = "DELETE FROM Venta WHERE ID_Cliente IN (SELECT ID_Cliente FROM Cliente WHERE Nombre = @nombre)";
-                    using (var comandoSql = new SqlCommand(eliminarVentasSql, conexionSql))
+                    try
                     {
-                        comandoSql.Parameters.AddWithValue("@nombre", cliente.Nombre);
-                        await comandoSql.ExecuteNonQueryAsync();
+                        using (var transaccion = conexionSql.BeginTransaction())
+                        {
+                            try
+                            {
+                                // Primero eliminamos las ventas relacionadas
+                                string eliminarVentasSql = "DELETE FROM Venta WHERE ID_Cliente IN (SELECT ID_Cliente FROM Cliente WHERE Nombre = @nombre)";
+                                using (var comandoSql = new SqlCommand(eliminarVentasSql, conexionSql, transaccion))
+                                {
+                                    comandoSql.Parameters.AddWithValue("@nombre", cliente.Nombre);
+                                    await comandoSql.ExecuteNonQueryAsync();
+                                    transaccion.Commit();
+                                }
+                                // Luego eliminamos el cliente
+                                string consultaSql = "DELETE FROM Cliente WHERE Nombre = @nombre";
+                                using (var comandoSql = new SqlCommand(consultaSql, conexionSql, transaccion))
+                                {
+                                    comandoSql.Parameters.AddWithValue("@nombre", cliente.Nombre);
+                                    var filasAfectadas = await comandoSql.ExecuteNonQueryAsync();
+                                    transaccion.Commit();
+                                    return filasAfectadas > 0 ? "Cliente y ventas eliminados correctamente" : "No se pudo eliminar el cliente";
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                transaccion.Rollback();
+                                throw new Exception("Sucedio un error al realizar el commit y el eliminar");
+                            }
+                        }
                     }
-
-                    // Luego eliminamos el cliente
-                    string consultaSql = "DELETE FROM Cliente WHERE Nombre = @nombre";
-                    using (var comandoSql = new SqlCommand(consultaSql, conexionSql))
+                    catch (Exception ex)
                     {
-                        comandoSql.Parameters.AddWithValue("@nombre", cliente.Nombre);
-                        var filasAfectadas = await comandoSql.ExecuteNonQueryAsync();
-                        return filasAfectadas > 0 ? "Cliente y ventas eliminados correctamente" : "No se pudo eliminar el cliente";
+                        
+                        throw new Exception("Sucedio un Error en la Transaccion" + ex.ToString());
                     }
                 }
             }
