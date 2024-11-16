@@ -38,15 +38,24 @@ namespace CapaDatos
                     {
                         throw new InvalidOperationException("No se pudo establecer la conexión a la base de datos.");
                     }
+                    var transaccion = conexionSql.BeginTransaction();
 
-                    string consultaSql = "INSERT INTO Proveedor (Nombre, Telefono, Direccion) VALUES (@nombre, @telefono, @direccion)";
-                    using (var comandoSql = new SqlCommand(consultaSql, conexionSql))
+                    try
                     {
-                        comandoSql.Parameters.Add("@nombre", SqlDbType.VarChar).Value = proveedor.Nombre;
-                        comandoSql.Parameters.Add("@telefono", SqlDbType.VarChar).Value = proveedor.Telefono;
-                        comandoSql.Parameters.Add("@direccion", SqlDbType.VarChar).Value = proveedor.Direccion;
-
-                        respuesta = await comandoSql.ExecuteNonQueryAsync() == 1 ? "Ok" : "No se pudo insertar el registro";
+                        string consultaSql = "INSERT INTO Proveedor (Nombre, Telefono, Direccion) VALUES (@nombre, @telefono, @direccion)";
+                        using (var comandoSql = new SqlCommand(consultaSql, conexionSql, transaccion))
+                        {
+                            comandoSql.Parameters.Add("@nombre", SqlDbType.VarChar).Value = proveedor.Nombre;
+                            comandoSql.Parameters.Add("@telefono", SqlDbType.VarChar).Value = proveedor.Telefono;
+                            comandoSql.Parameters.Add("@direccion", SqlDbType.VarChar).Value = proveedor.Direccion;
+                            transaccion.Commit();
+                            respuesta = await comandoSql.ExecuteNonQueryAsync() == 1 ? "Ok" : "No se pudo insertar el registro";
+                        }
+                    }
+                    catch (Exception ex) 
+                    {
+                        transaccion.Rollback();
+                        throw new Exception("No se puedo realizar correctametne la insercion" + ex.Message);
                     }
                 }
             }
@@ -73,15 +82,25 @@ namespace CapaDatos
                         throw new InvalidOperationException("No se pudo establecer la conexión a la base de datos.");
                     }
 
-                    string consultaSql = "UPDATE Proveedor SET Nombre = @nombre, Telefono = @telefono, Dirección = @direccion WHERE ID_Proveedor = @idproveedor";
-                    using (var comandoSql = new SqlCommand(consultaSql, conexionSql))
-                    {
-                        comandoSql.Parameters.Add("@idproveedor", SqlDbType.Int).Value = proveedor.IDProveedor;
-                        comandoSql.Parameters.Add("@nombre", SqlDbType.VarChar).Value = proveedor.Nombre;
-                        comandoSql.Parameters.Add("@telefono", SqlDbType.VarChar).Value = proveedor.Telefono;
-                        comandoSql.Parameters.Add("@direccion", SqlDbType.VarChar).Value = proveedor.Direccion;
+                    var transaccion = conexionSql.BeginTransaction();
 
-                        respuesta = await comandoSql.ExecuteNonQueryAsync() == 1 ? "Ok" : "No se pudo editar el registro";
+                    try
+                    {
+                        string consultaSql = "UPDATE Proveedor SET Nombre = @nombre, Telefono = @telefono, Dirección = @direccion WHERE ID_Proveedor = @idproveedor";
+                        using (var comandoSql = new SqlCommand(consultaSql, conexionSql, transaccion))
+                        {
+                            comandoSql.Parameters.Add("@idproveedor", SqlDbType.Int).Value = proveedor.IDProveedor;
+                            comandoSql.Parameters.Add("@nombre", SqlDbType.VarChar).Value = proveedor.Nombre;
+                            comandoSql.Parameters.Add("@telefono", SqlDbType.VarChar).Value = proveedor.Telefono;
+                            comandoSql.Parameters.Add("@direccion", SqlDbType.VarChar).Value = proveedor.Direccion;
+
+                            transaccion.Commit();
+                            respuesta = await comandoSql.ExecuteNonQueryAsync() == 1 ? "Ok" : "No se pudo editar el registro";
+                        }
+                    }catch (Exception ex)
+                    {
+                        transaccion.Rollback();
+                        throw new Exception("No se puedo realizar la transaccion" + ex.Message);
                     }
                 }
             }
@@ -107,12 +126,20 @@ namespace CapaDatos
                     {
                         throw new InvalidOperationException("No se pudo establecer la conexión a la base de datos.");
                     }
+                    var transaccion = conexionSql.BeginTransaction();
 
-                    string consultaSql = "DELETE FROM Proveedor WHERE ID_Proveedor = @idproveedor";
-                    using (var comandoSql = new SqlCommand(consultaSql, conexionSql))
+                    try
                     {
-                        comandoSql.Parameters.AddWithValue("@idproveedor", proveedor.IDProveedor);
-                        respuesta = await comandoSql.ExecuteNonQueryAsync() == 1 ? "Ok" : "No se pudo eliminar el registro";
+                        string consultaSql = "DELETE FROM Proveedor WHERE ID_Proveedor = @idproveedor";
+                        using (var comandoSql = new SqlCommand(consultaSql, conexionSql, transaccion))
+                        {
+                            comandoSql.Parameters.AddWithValue("@idproveedor", proveedor.IDProveedor);
+                            respuesta = await comandoSql.ExecuteNonQueryAsync() == 1 ? "Ok" : "No se pudo eliminar el registro";
+                        }
+                    }catch (Exception ex)
+                    {
+                        conexionSql.BeginTransaction();
+                        throw new Exception("No se realizo la transaccion correctamente" + ex.Message);
                     }
                 }
             }
