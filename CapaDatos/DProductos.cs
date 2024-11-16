@@ -26,29 +26,40 @@ namespace CapaDatos
         public string Descripcion { get; set; }
         public int IdProveedor { get; set; }
         #endregion
+
         #region MetodoInsertar
         public async Task<string> InsertarAsync(DProductos producto)
         {
             string respuesta;
             using (var conexionSql = await Utilidades.ObtenerConexionAsync())
             {
-                try
+
+                if (conexionSql == null)
                 {
-                    string consultaSql = "INSERT INTO Producto (Nombre, Precio, Descripcion) VALUES (@nombre, @precio, @descripcion)";
-                    using (var comandoSql = new SqlCommand(consultaSql, conexionSql))
-                    {
-
-                        comandoSql.Parameters.Add("@nombre", SqlDbType.NVarChar).Value = producto.Nombre;
-                        comandoSql.Parameters.Add("@precio", SqlDbType.Decimal).Value = producto.Precio;
-                        comandoSql.Parameters.Add("@descripcion", SqlDbType.NVarChar).Value = producto.Descripcion;
-                        comandoSql.Parameters.Add("@idProveedor", SqlDbType.Int).Value = producto.IdProveedor;
-
-                        respuesta = await comandoSql.ExecuteNonQueryAsync() == 1 ? "Ok" : "No se pudo insertar el registro";
-                    }
+                    throw new Exception("No se Puedo Establecer la Conexion");
                 }
-                catch (Exception ex)
+
+                using (var transaccion = conexionSql.BeginTransaction())
                 {
-                    respuesta = ex.Message; // Consider logging the exception here.
+                    try
+                    {
+                        string consultaSql = "INSERT INTO Producto (Nombre, Precio, Descripcion) VALUES (@nombre, @precio, @descripcion)";
+                        using (var comandoSql = new SqlCommand(consultaSql, conexionSql, transaccion))
+                        {
+
+                            comandoSql.Parameters.Add("@nombre", SqlDbType.NVarChar).Value = producto.Nombre;
+                            comandoSql.Parameters.Add("@precio", SqlDbType.Decimal).Value = producto.Precio;
+                            comandoSql.Parameters.Add("@descripcion", SqlDbType.NVarChar).Value = producto.Descripcion;
+                            comandoSql.Parameters.Add("@idProveedor", SqlDbType.Int).Value = producto.IdProveedor;
+                            transaccion.Commit();
+                            respuesta = await comandoSql.ExecuteNonQueryAsync() == 1 ? "Ok" : "No se pudo insertar el registro";
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        transaccion.Rollback();
+                        respuesta = ex.Message; // Consider logging the exception here.
+                    }
                 }
             }
 
@@ -62,26 +73,33 @@ namespace CapaDatos
             string respuesta;
             using (var conexionSql = await Utilidades.ObtenerConexionAsync())
             {
-                try
+                if (conexionSql == null)
+                    throw new Exception("No se Puedo Establecer la Conexion");
+                using (var transaccion = conexionSql.BeginTransaction())
                 {
-                    string consultaSql = "UPDATE Producto SET Nombre = @nombre, Precio = @precio, Descripcion = @descripcion, ID_Proveedor = @idProveedor WHERE ID_Producto = @idProducto";
-                    using (var comandoSql = new SqlCommand(consultaSql, conexionSql))
+                    try
                     {
-                        comandoSql.Parameters.AddWithValue("@idProducto", producto.IdProducto);
-                        comandoSql.Parameters.AddWithValue("@nombre", producto.Nombre);
-                        comandoSql.Parameters.AddWithValue("@precio", producto.Precio);
-                        comandoSql.Parameters.AddWithValue("@descripcion", producto.Descripcion);
-                        comandoSql.Parameters.AddWithValue("@idProveedor", producto.IdProveedor);
+                        string consultaSql = "UPDATE Producto SET Nombre = @nombre, Precio = @precio, Descripcion = @descripcion, ID_Proveedor = @idProveedor WHERE ID_Producto = @idProducto";
+                        using (var comandoSql = new SqlCommand(consultaSql, conexionSql, transaccion))
+                        {
+                            comandoSql.Parameters.AddWithValue("@idProducto", producto.IdProducto);
+                            comandoSql.Parameters.AddWithValue("@nombre", producto.Nombre);
+                            comandoSql.Parameters.AddWithValue("@precio", producto.Precio);
+                            comandoSql.Parameters.AddWithValue("@descripcion", producto.Descripcion);
+                            comandoSql.Parameters.AddWithValue("@idProveedor", producto.IdProveedor);
 
-                        respuesta = await comandoSql.ExecuteNonQueryAsync() == 1 ? "Ok" : "No se pudo editar el registro";
+                            transaccion.Commit();
+                            respuesta = await comandoSql.ExecuteNonQueryAsync() == 1 ? "Ok" : "No se pudo editar el registro";
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    respuesta = ex.Message; // Consider logging the exception here.
+                    catch (Exception ex)
+                    {
+                        transaccion.Rollback();
+                        respuesta = ex.Message; // Consider logging the exception here.
+                    }
+
                 }
             }
-
             return respuesta;
         }
         #endregion
@@ -92,18 +110,23 @@ namespace CapaDatos
             string respuesta;
             using (var conexionSql = await Utilidades.ObtenerConexionAsync())
             {
+                if (conexionSql == null)
+                    throw new Exception("No se puedo Establer la Conexion");
+                var transaccion = conexionSql.BeginTransaction();   
                 try
                 {
                     string consultaSql = "DELETE FROM Producto WHERE ID_Producto = @idProducto";
-                    using (var comandoSql = new SqlCommand(consultaSql, conexionSql))
+                    using (var comandoSql = new SqlCommand(consultaSql, conexionSql, transaccion))
                     {
                         comandoSql.Parameters.AddWithValue("@idProducto", producto.IdProducto);
 
+                        transaccion.Commit();
                         respuesta = await comandoSql.ExecuteNonQueryAsync() == 1 ? "Ok" : "No se pudo eliminar el registro";
                     }
                 }
                 catch (Exception ex)
                 {
+                    transaccion.Rollback();
                     respuesta = ex.Message; // Consider logging the exception here.
                 }
             }
