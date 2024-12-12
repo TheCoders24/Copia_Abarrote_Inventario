@@ -1,4 +1,5 @@
 ﻿using CapaDatos;
+using CapaNegocio;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -131,6 +132,36 @@ namespace Copia_Abarrote_Inventario
             string nombreCliente = comboBoxCliente.Text;
 
             CargarDetallesVenta(nombreProducto, nombreCliente, cantidad, precioUnitario);
+
+
+            // Generar ticket PDF
+            // 1. Creas una instancia de la clase tickets
+            tickets ticket = new tickets();
+
+            // 2. Aquí debes definir la variable que contiene los datos de la venta, por ejemplo:
+            // En este ejemplo, se crea un DataTable con los datos de la venta, puedes adaptarlo según tu lógica:
+            DataTable datosVenta = new DataTable();
+            datosVenta.Columns.Add("NombreProducto");
+            datosVenta.Columns.Add("Cantidad");
+            datosVenta.Columns.Add("Total");
+
+            // Añadir datos de la venta al DataTable
+            datosVenta.Rows.Add(nombreProducto, cantidad, importe);
+
+            // Supongamos que el total y el monto recibido son variables ya calculadas
+            decimal total = importe; // Ajusta este valor según lo calculado
+            decimal montoRecibido = 1000; // Ejemplo, puedes poner el monto recibido por el cliente
+            decimal cambio = montoRecibido - total; // Calculamos el cambio
+
+            // Calculamos el desglose de billetes
+            Dictionary<int, int> desgloseBilletes = ticket.CalcularDesgloseBilletes(cambio);
+
+            // Generar el ticket en PDF
+            string rutaTicket = ticket.GenerarTicketPDF(1, datosVenta, total, montoRecibido, cambio, desgloseBilletes);
+
+            // Mostrar el mensaje de éxito y la ruta del ticket generado
+            MessageBox.Show($"Ticket generado con éxito: {rutaTicket}");
+
         }
         public async Task CargarDetallesVenta(string nombreProducto, string nombreCliente, int cantidad, decimal precioUnitario)
         {
