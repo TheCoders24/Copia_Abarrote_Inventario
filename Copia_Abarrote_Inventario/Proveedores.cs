@@ -27,7 +27,7 @@ namespace Copia_Abarrote_Inventario
             {
                 try
                 {
-                    // Llamamos a la función para insertar el cliente si el ID es válido
+                    // Llamamos a la función para insertar el proveedor
                     string resultado = await NProveedores.InsertarProveedorAsync(idProveedor, txtNombre.Text, txtDireccion.Text, mtxtTelefono.Text);
 
                     // Opcional: mostrar un mensaje si la inserción fue exitosa
@@ -37,11 +37,6 @@ namespace Copia_Abarrote_Inventario
                 {
                     MessageBox.Show("Ocurrió un error al insertar el Proveedor: " + ex.Message);
                 }
-            }
-            else
-            {
-                // Mostramos un mensaje si el ID no es válido
-                MessageBox.Show("El ID del Proveedor no es válido");
             }
         }
 
