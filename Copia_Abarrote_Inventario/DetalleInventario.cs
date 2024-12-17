@@ -1,5 +1,6 @@
 ﻿using CapaDatos;
 using CapaNegocio;
+using iTextSharp.text;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -134,35 +135,83 @@ namespace Copia_Abarrote_Inventario
             CargarDetallesVenta(nombreProducto, nombreCliente, cantidad, precioUnitario);
 
 
-            // Generar ticket PDF
-            // 1. Creas una instancia de la clase tickets
-            tickets ticket = new tickets();
+            try
+            {
+                // Obtener los datos de la venta
+                int idVenta = ObtenerIdVenta();  // Suponiendo que tienes un método para obtener el ID de venta
+                UserControl1 userControl1 = new UserControl1();
 
-            // 2. Aquí debes definir la variable que contiene los datos de la venta, por ejemplo:
-            // En este ejemplo, se crea un DataTable con los datos de la venta, puedes adaptarlo según tu lógica:
-            DataTable datosVenta = new DataTable();
-            datosVenta.Columns.Add("NombreProducto");
-            datosVenta.Columns.Add("Cantidad");
-            datosVenta.Columns.Add("Total");
+                // Obtener el monto recibido desde el UserControl1
+                decimal montoRecibido;
+                if (!decimal.TryParse(userControl1.TxtMonto.Text, out montoRecibido))
+                {
+                    throw new Exception("El monto recibido no tiene un formato válido.");
+                }
 
-            // Añadir datos de la venta al DataTable
-            datosVenta.Rows.Add(nombreProducto, cantidad, importe);
+                // Obtener los datos de la venta (se puede hacer desde la vista o un DataTable pasado manualmente)
+                DataTable datosVenta = ObtenerDatosVenta(idVenta);  // Método que obtiene los datos de la venta
 
-            // Supongamos que el total y el monto recibido son variables ya calculadas
-            decimal total = importe; // Ajusta este valor según lo calculado
-            decimal montoRecibido = 1000; // Ejemplo, puedes poner el monto recibido por el cliente
-            decimal cambio = montoRecibido - total; // Calculamos el cambio
+                // Calcular el total de la venta
+                decimal totalVenta = Convert.ToDecimal(datosVenta.Compute("SUM(Total)", string.Empty));
 
-            // Calculamos el desglose de billetes
-            Dictionary<int, int> desgloseBilletes = ticket.CalcularDesgloseBilletes(cambio);
+                // Calcular el cambio
+                decimal cambio = montoRecibido - totalVenta;
 
-            // Generar el ticket en PDF
-            string rutaTicket = ticket.GenerarTicketPDF(1, datosVenta, total, montoRecibido, cambio, desgloseBilletes);
+                // Validar si el monto recibido es suficiente para cubrir la venta
+                if (cambio < 0)
+                {
+                    throw new Exception("El monto recibido es insuficiente para cubrir el total de la venta.");
+                }
 
-            // Mostrar el mensaje de éxito y la ruta del ticket generado
-            MessageBox.Show($"Ticket generado con éxito: {rutaTicket}");
+                // Crear el ticket asincrónicamente
+                tickets ticketGenerator = new tickets($"Server={Utilidades.SqlServer};Database={Utilidades.SqlDataBase};User Id={Utilidades.SqlUserId};Password={Utilidades.SqlPassword};Pooling=true;Min Pool Size=1;Max Pool Size=100;");
+
+                // Generar el PDF del ticket
+                string rutaTicket = ticketGenerator.GenerarTicketPDF(idVenta, datosVenta, montoRecibido, cambio);
+
+                // Mostrar mensaje o realizar alguna acción luego de generar el ticket
+                MessageBox.Show($"Ticket generado con éxito. Ubicación: {rutaTicket}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                // Manejar cualquier error que ocurra
+                MessageBox.Show($"Error al generar el ticket: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+
 
         }
+        private int ObtenerIdVenta()
+        {
+            // Obtener el ID de la venta de algún control, como un TextBox o ComboBox
+            return Convert.ToInt32(resultado);  // Asumiendo que el ID de la venta se ingresa en un TextBox
+        }
+
+        private DataTable ObtenerDatosVenta(int idVenta)
+        {
+            // Este es el mismo método que ya tienes para obtener los datos de la venta.
+            string query = "SELECT * FROM Vista_Ticket WHERE ID_Venta = @ID_Venta";
+            DataTable datosVenta = new DataTable();
+
+            using (var connection = new SqlConnection($"Server={Utilidades.SqlServer};Database={Utilidades.SqlDataBase};User Id={Utilidades.SqlUserId};Password={Utilidades.SqlPassword};Pooling=true;Min Pool Size=1;Max Pool Size=100;"))
+            {
+                connection.Open(); // Asegúrate de abrir la conexión
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    // Agregar el parámetro del ID de venta
+                    command.Parameters.AddWithValue("@ID_Venta", idVenta);
+
+                    // Llenar el DataTable con los datos obtenidos
+                    SqlDataAdapter adapter = new SqlDataAdapter(command);
+                    adapter.Fill(datosVenta);
+                }
+            }
+
+            return datosVenta;
+
+        }
+
+        public int resultado;
         public async Task CargarDetallesVenta(string nombreProducto, string nombreCliente, int cantidad, decimal precioUnitario)
         {
             // Validaciones de los datos
@@ -229,7 +278,7 @@ namespace Copia_Abarrote_Inventario
 
                         // Ejecutar el procedimiento
                         await command.ExecuteNonQueryAsync();
-                        int resultado = (int)command.Parameters["@Resultado"].Value;
+                         resultado = (int)command.Parameters["@Resultado"].Value;
                         if (resultado == -1)
                         {
                             MessageBox.Show("No hay suficiente inventario para completar la venta.");
